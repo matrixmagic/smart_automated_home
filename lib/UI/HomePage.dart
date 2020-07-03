@@ -2,6 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:smartautomatedhome/Repository/ArduinoRepo.dart';
 import 'package:smartautomatedhome/models/AllState.dart';
+import 'package:signalr_client/signalr_client.dart';
+import 'package:flutter/src/widgets/async.dart' as htt;
+
 
 class HomePage extends StatefulWidget {
   @override
@@ -9,6 +12,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
+  List<String> chats;
+  HubConnection connection;
+  bool firsttime=false;
+  bool ledState;
+  bool securty;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,6 +29,15 @@ class _HomePageState extends State<HomePage> {
       body: SafeArea(
         child: Column(
           children: <Widget>[
+            firsttime==false?
+            FutureBuilder<Object>(
+              future:   createSignalRConnection(),
+              builder: (context, snapshot) {
+
+                firsttime=true;
+                return Container();
+              }
+            ):Container(),
             Container(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -31,14 +49,12 @@ class _HomePageState extends State<HomePage> {
                   FutureBuilder(
                       future: ArduinoRepo().GetAllStates(),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.done) {
+                        if (snapshot.connectionState == htt.ConnectionState.done) {
                           bool led = (snapshot.data as AllState).ledState;
                           return Switch(
                               onChanged: (bool value) {
                                 ArduinoRepo().changeledstate();
-                                setState(() {
-                                  led = !value;
-                                });
+                               
                               },
                               activeColor: Colors.blue,
                               value: led);
@@ -122,12 +138,30 @@ class _HomePageState extends State<HomePage> {
             FloatingActionButton(
               child: Text('shomakan'),
               onPressed: () {
-                ArduinoRepo().shomakan();
+              createSignalRConnection();
               },
             )
           ],
         ),
       ),
     );
+  }
+  
+   Future<void> createSignalRConnection() async {
+    connection = HubConnectionBuilder().withUrl("http://192.168.43.161:8089/eventHub").build();
+    print(connection.state);
+    await connection.start();
+    print(connection.state);
+    //connection.invoke("fromclient",args: ["bikaaaa"]);
+    connection.on("thereIsChange", (data) async {
+      print("thereIsChangethereIsChange thereIsChangethereIsChangethereIsChange");
+var states=  await ArduinoRepo().GetAllStates();
+setState(() {
+  ledState =states.ledState;
+});
+
+
+
+    });
   }
 }

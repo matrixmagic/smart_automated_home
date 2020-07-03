@@ -6,7 +6,7 @@ import 'dart:async';
 import 'package:http/http.dart';
 
 class ApiProvider {
-  final String _baseUrl = "http://192.168.137.1:8089/api/";
+  final String _baseUrl = "http://192.168.43.161:8089/api/";
 
   Future<Response> get(String url) async {
     try {
