@@ -68,6 +68,9 @@ class _walk_screenState extends State<walk_screen> {
                 ),
               ),
             ),
+            SizedBox(
+              height: 40,
+            ),
             Padding(
                 padding: EdgeInsets.only(top: 40),
                 child: Center(
@@ -80,6 +83,9 @@ class _walk_screenState extends State<walk_screen> {
                     ),
                   ),
                 )),
+            SizedBox(
+              height: 50,
+            ),
             Padding(
                 padding: EdgeInsets.only(top: 20),
                 child: Center(

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:smartautomatedhome/UI/VerificationCodeInput.dart';
+import 'UI/HomePage.dart';
 import 'UI/mainScreen.dart';
 import 'UI/walk_screen.dart';
 
@@ -18,8 +20,9 @@ class MyApp extends StatelessWidget {
         // When navigating to the "/" route, build the FirstScreen widget.
         '/': (context) => walk_screen(),
         // When navigating to the "/second" route, build the SecondScreen widget.
-        '/root': (context) => SecondScreen(),
-        /*'/login': (context) => logiscreen(),*/
+        '/root': (context) => VerificationCodeInput(),
+        /*  '/login': (context) => SecondScreen(),*/
+        '/home': (context) => SecondScreen(),
       },
     );
   }

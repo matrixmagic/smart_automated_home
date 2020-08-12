@@ -4,7 +4,7 @@ import 'package:smartautomatedhome/Repository/ArduinoRepo.dart';
 import 'package:smartautomatedhome/models/AllState.dart';
 import 'package:signalr_client/signalr_client.dart';
 import 'package:flutter/src/widgets/async.dart' as htt;
-
+import 'package:audioplayers/audio_cache.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -12,32 +12,35 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   List<String> chats;
+  final player = AudioCache();
   HubConnection connection;
-  bool firsttime=false;
+  bool firsttime = false;
   bool ledState;
   bool securty;
+  bool on = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      /*appBar: AppBar(
         backgroundColor: Colors.grey,
         centerTitle: true,
         title: Text('Home'),
-      ),
+      ),*/
       body: SafeArea(
         child: Column(
           children: <Widget>[
-            firsttime==false?
-            FutureBuilder<Object>(
-              future:   createSignalRConnection(),
-              builder: (context, snapshot) {
-
-                firsttime=true;
-                return Container();
-              }
-            ):Container(),
+            firsttime == false
+                ? FutureBuilder<Object>(
+                    future: createSignalRConnection(),
+                    builder: (context, snapshot) {
+                      firsttime = true;
+                      return Container();
+                    })
+                : Container(),
+            SizedBox(
+              height: 20,
+            ),
             Container(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -49,12 +52,12 @@ class _HomePageState extends State<HomePage> {
                   FutureBuilder(
                       future: ArduinoRepo().GetAllStates(),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == htt.ConnectionState.done) {
+                        if (snapshot.connectionState ==
+                            htt.ConnectionState.done) {
                           bool led = (snapshot.data as AllState).ledState;
                           return Switch(
                               onChanged: (bool value) {
                                 ArduinoRepo().changeledstate();
-                               
                               },
                               activeColor: Colors.blue,
                               value: led);
@@ -107,7 +110,7 @@ class _HomePageState extends State<HomePage> {
                       child: Row(
                         children: <Widget>[
                           Text(
-                            '22 ',
+                            '22°',
                             style: TextStyle(fontSize: 31),
                           ),
                           Text(
@@ -121,7 +124,7 @@ class _HomePageState extends State<HomePage> {
                       child: Row(
                         children: <Widget>[
                           Text(
-                            '25 ',
+                            '25°',
                             style: TextStyle(fontSize: 31),
                           ),
                           Text(
@@ -133,35 +136,83 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ],
                 ),
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Container(
+                        child: Text(
+                          'Humidity',
+                          style:
+                              TextStyle(fontSize: 22, color: Colors.redAccent),
+                        ),
+                      ),
+                      Container(
+                        child: Text('15%', style: TextStyle(fontSize: 31)),
+                      )
+                    ],
+                  ),
+                )
               ],
             ),
-            FloatingActionButton(
-              child: Text('shomakan'),
-              onPressed: () {
-              createSignalRConnection();
-              },
+            Container(
+              child: FloatingActionButton(
+                child: Text('shomakan'),
+                onPressed: () {
+                  createSignalRConnection();
+                },
+              ),
+            ),
+            Container(
+              child: FlatButton(
+                color: Colors.red,
+                child: Text('alert'),
+                onPressed: () {
+                  setState(() {
+                    on = !on;
+                  });
+
+                  player.play('Alarm1.mp3');
+                },
+              ),
+            ),
+            Container(
+              child: AnimatedDefaultTextStyle(
+                  child: Text('fire!!!'),
+                  curve: Curves.fastOutSlowIn,
+                  duration: Duration(milliseconds: 20),
+                  style: on
+                      ? (TextStyle(
+                          fontSize: 50,
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold))
+                      : TextStyle(
+                          fontSize: 1,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold)),
             )
           ],
         ),
       ),
     );
   }
-  
-   Future<void> createSignalRConnection() async {
-    connection = HubConnectionBuilder().withUrl("http://192.168.43.161:8089/eventHub").build();
+
+  Future<void> createSignalRConnection() async {
+    connection = HubConnectionBuilder()
+        .withUrl("http://192.168.43.161:8089/eventHub")
+        .build();
     print(connection.state);
     await connection.start();
     print(connection.state);
     //connection.invoke("fromclient",args: ["bikaaaa"]);
     connection.on("thereIsChange", (data) async {
-      print("thereIsChangethereIsChange thereIsChangethereIsChangethereIsChange");
-var states=  await ArduinoRepo().GetAllStates();
-setState(() {
-  ledState =states.ledState;
-});
-
-
-
+      print(
+          "thereIsChangethereIsChange thereIsChangethereIsChangethereIsChange");
+      var states = await ArduinoRepo().GetAllStates();
+      setState(() {
+        ledState = states.ledState;
+      });
     });
   }
 }

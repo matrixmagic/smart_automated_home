@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'ChartsPage.dart';
 import 'HelpPage.dart';
 import 'HomePage.dart';
 
@@ -15,10 +16,17 @@ class _SecondScreenState extends State<SecondScreen>
   AnimationController controller;
   GlobalKey<ScaffoldState> _drawerKey = GlobalKey();
 
-  List<String> leftNav = ["Home", "help", "feedback", "invite friend"];
+  List<String> leftNav = [
+    "Home",
+    "Charts and Diagrams",
+    "Helps",
+    "feedback",
+    "invite friend"
+  ];
 
   List<Icon> navbaricons = [
     Icon(Icons.home),
+    Icon(Icons.show_chart),
     Icon(Icons.help),
     Icon(Icons.group),
     Icon(Icons.share)
@@ -50,17 +58,7 @@ class _SecondScreenState extends State<SecondScreen>
               controller.forward();
             }
           },
-        )
-            /* leading: IconButton(
-            icon: Icon(Icons.menu),
-            onPressed: () {
-              _drawerKey.currentState.openDrawer();
-              */ /* if (_drawerKey.currentState.isDrawerOpen) {
-                print('drawer is opennnnnnn');
-                controller.forward();
-              }*/ /*
-            }),*/
-            ),
+        )),
         drawer: Drawer(
             child: ListView(
                 // Important: Remove any padding from the ListView.
@@ -150,9 +148,12 @@ class _SecondScreenState extends State<SecondScreen>
         return HomePage();
         break;
       case 1:
-        return HelpPage();
+        return ChartsPage();
         break;
       case 2:
+        return HelpPage();
+        break;
+      case 3:
         return HelpPage();
         break;
       default:

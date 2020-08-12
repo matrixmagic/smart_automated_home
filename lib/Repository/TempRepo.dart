@@ -6,7 +6,7 @@ import 'package:smartautomatedhome/models/AllState.dart';
 import 'package:logging/logging.dart';
 import 'package:signalr_client/signalr_client.dart';
 
-class ArduinoRepo {
+class TempRepo {
   ApiProvider api = new ApiProvider();
 
   Future<AllState> GetAllStates() async {
